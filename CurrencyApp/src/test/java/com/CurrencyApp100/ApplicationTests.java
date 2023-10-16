@@ -1,4 +1,4 @@
-package com.CurrencyApp100;
+package com.CurrencyApp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
