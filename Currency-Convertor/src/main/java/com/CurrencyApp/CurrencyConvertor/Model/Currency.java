@@ -1,13 +1,13 @@
 package com.CurrencyApp.CurrencyConvertor.Model;
 
 public class Currency {
-    private Integer currencyId;
+    private String currencyId;
     private String currency;
 
     public Currency(){
     }
 
-    public Currency(Integer currencyId, String currency){
+    public Currency(String currencyId, String currency){
         this.currencyId = currencyId;
         this.currency = currency;
     }
@@ -18,11 +18,11 @@ public class Currency {
         this.currency = currency;
     }
 
-    public void setCurrencyId(Integer currencyId) {
+    public void setCurrencyId(String currencyId) {
         this.currencyId = currencyId;
     }
 
-    public Integer getCurrencyId() {
+    public String getCurrencyId() {
         return currencyId;
     }
 }

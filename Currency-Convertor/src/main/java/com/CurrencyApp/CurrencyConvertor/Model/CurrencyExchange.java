@@ -1,9 +1,22 @@
 package com.CurrencyApp.CurrencyConvertor.Model;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "currency_exchange_rates")
+@ApiModel(description = "This table holds cloud vendor information.")
 public class CurrencyExchange {
+    @Id
+    @ApiModelProperty(notes="This is a Cloud Vendor Id. It shall be unique.")
     private String fromCurrencyId;
     private String toCurrencyId;
     private String rate;
+
+
     public CurrencyExchange() {
     }
 
@@ -19,6 +32,7 @@ public class CurrencyExchange {
     public void setToCurrencyId(String toCurrencyId){ this.toCurrencyId = toCurrencyId;}
     public String getRate(){return rate;}
     public void setRate(String rate){ this.rate = rate;}
+
 
 
 
