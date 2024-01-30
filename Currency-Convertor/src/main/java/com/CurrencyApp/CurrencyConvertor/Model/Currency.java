@@ -1,28 +1,47 @@
 package com.CurrencyApp.CurrencyConvertor.Model;
 
+import java.time.LocalDate;
+
 public class Currency {
-    private String currencyId;
-    private String currency;
+    private LocalDate date;
+    private String toCurrency;
+    private String fromCurrency;
 
     public Currency(){
     }
 
-    public Currency(String currencyId, String currency){
-        this.currencyId = currencyId;
-        this.currency = currency;
+    public Currency(LocalDate date,String toCurrency, String fromCurrency){
+        this.date = date;
+        this.toCurrency = toCurrency;
+        this.fromCurrency = fromCurrency;
     }
 
-    public String getCurrency(){return currency;}
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setCurrencyId(String currencyId) {
-        this.currencyId = currencyId;
+    public String getFromCurrency() {
+        return fromCurrency;
     }
 
-    public String getCurrencyId() {
-        return currencyId;
+    public String getToCurrency() {
+        return toCurrency;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public void setToCurrency(String toCurrency) {
+        this.toCurrency = toCurrency;
+    }
+
+    public void setFromCurrency(String fromCurrency) {
+        this.fromCurrency = fromCurrency;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
