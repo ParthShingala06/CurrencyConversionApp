@@ -7,6 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "currency_exchange_rates")
@@ -30,6 +31,8 @@ public class CurrencyExchange {
     private Double CNY;
     private Double JPY;
     private Double MXN;
+    private Integer TotalCurrencies = 15;
+    private String[] CurrenciesList =  {"USD","INR","RUB","BHD","OMR","GBD","CHF","NZD","AUD","SGD","CAD","KYD","CNY","JPY","MXN"};
 
 
 
@@ -55,7 +58,24 @@ public class CurrencyExchange {
         this.JPY = JPY;
         this.MXN = MXN;
     }
-
+    public Double getCurrencyRatio(String currency){
+        if(currency.toUpperCase().equals("USD")){ return USD;}
+        else if(currency.toUpperCase().equals("INR")){ return INR;}
+        else if(currency.toUpperCase().equals("RUB")){ return RUB;}
+        else if(currency.toUpperCase().equals("BHD")){ return BHD;}
+        else if(currency.toUpperCase().equals("OMR")){ return OMR;}
+        else if(currency.toUpperCase().equals("GBD")){ return GBD;}
+        else if(currency.toUpperCase().equals("CHF")){ return CHF;}
+        else if(currency.toUpperCase().equals("NZD")){ return NZD;}
+        else if(currency.toUpperCase().equals("AUD")){ return AUD;}
+        else if(currency.toUpperCase().equals("SGD")){ return SGD;}
+        else if(currency.toUpperCase().equals("CAD")){ return CAD;}
+        else if(currency.toUpperCase().equals("KYD")){ return KYD;}
+        else if(currency.toUpperCase().equals("CNY")){ return CNY;}
+        else if(currency.toUpperCase().equals("JPY")){ return JPY;}
+        else if(currency.toUpperCase().equals("MXN")){ return MXN;}
+        return null;
+    }
     public LocalDate getDate() {
         return date;
     }
@@ -74,6 +94,8 @@ public class CurrencyExchange {
     public Double getCNY() { return CNY;}
     public Double getJPY() { return JPY;}
     public Double getMXN() { return MXN;}
+    public Integer getTotalCurrencies() { return TotalCurrencies; }
+    public String[] getCurrenciesList() { return CurrenciesList; }
 
 
 
@@ -95,6 +117,9 @@ public class CurrencyExchange {
     public void setCNY(Double CNY) {this.CNY = CNY;}
     public void setJPY(Double JPY) {this.JPY = JPY;}
     public void setMXN(Double MXN) {this.MXN = MXN;}
+    public void setTotalCurrencies(Integer totalCurrencies) {
+        TotalCurrencies = totalCurrencies;
+    }
 
     @Override
     public String toString() {
