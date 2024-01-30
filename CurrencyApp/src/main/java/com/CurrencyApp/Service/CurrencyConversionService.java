@@ -10,23 +10,23 @@ public class CurrencyConversionService {
     @Autowired
     private ExchangeRateRepository exchangeRateRepository;
 
-    public BigDecimal convertCurrency(String sourceCurrency, String targetCurrency, BigDecimal amount) {
-        // Implement the conversion logic using exchange rates from the repository
-        ExchangeRate exchangeRateOptional = exchangeRateRepository
-                .findTop1BySourceCurrencyAndTargetCurrencyOrderByDateDesc(sourceCurrency, targetCurrency);
-
-        if (exchangeRateOptional.isPresent()) {
-            ExchangeRate exchangeRate = exchangeRateOptional.get();
-            return amount.multiply(exchangeRate.getRate());
-        }
-//        else {
-//            throw new ExchangeRateNotFoundException("Exchange rate not found for the specified currency pair.");
+//    public BigDecimal convertCurrency(String sourceCurrency, String targetCurrency, BigDecimal amount) {
+//        // Implement the conversion logic using exchange rates from the repository
+//        ExchangeRate exchangeRateOptional = exchangeRateRepository
+//                .findTop1BySourceCurrencyAndTargetCurrencyOrderByDateDesc(sourceCurrency, targetCurrency);
+//
+//        if (exchangeRateOptional.isPresent()) {
+//            ExchangeRate exchangeRate = exchangeRateOptional.get();
+//            return amount.multiply(exchangeRate.getRate());
 //        }
-    }
+////        else {
+////            throw new ExchangeRateNotFoundException("Exchange rate not found for the specified currency pair.");
+////        }
+//    }
 
-    public List<ExchangeRate> getExchangeRatesBySourceAndTarget(String sourceCurrency, String targetCurrency) {
-        return exchangeRateRepository.findBySourceCurrencyAndTargetCurrency(sourceCurrency, targetCurrency);
-    }
+//    public List<ExchangeRate> getExchangeRatesBySourceAndTarget(String sourceCurrency, String targetCurrency) {
+//        return exchangeRateRepository.findBySourceCurrencyAndTargetCurrency(sourceCurrency, targetCurrency);
+//    }
 
     public List<ExchangeRate> getExchangeRatesByDate(LocalDate date) {
         return exchangeRateRepository.findByDate(date);

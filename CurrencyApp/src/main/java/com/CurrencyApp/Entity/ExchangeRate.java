@@ -6,55 +6,54 @@ import java.time.LocalDate;
 public class ExchangeRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String sourceCurrency;
-    private String targetCurrency;
-    private BigDecimal rate;
-    private LocalDate date;
+//    private Long id;
+    private String US;
+    private String IND;
+//    private BigDecimal rate;
+    private LocalDate Date;
 
     public ExchangeRate() {
         // Default constructor
     }
 
-    public ExchangeRate(String sourceCurrency, String targetCurrency, BigDecimal rate, LocalDate date) {
-        this.sourceCurrency = sourceCurrency;
-        this.targetCurrency = targetCurrency;
-        this.rate = rate;
+    public ExchangeRate(String USCurrency, String INDCurrency, LocalDate date) {
+        this.US = USCurrency;
+        this.IND = INDCurrency;
+//        this.rate = rate;
         this.date = date;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     public String getSourceCurrency() {
-        return sourceCurrency;
+        return USD;
     }
 
     public void setSourceCurrency(String sourceCurrency) {
-        this.sourceCurrency = sourceCurrency;
+        this.USD = sourceCurrency;
     }
 
     public String getTargetCurrency() {
-        return targetCurrency;
+        return IND;
     }
 
     public void setTargetCurrency(String targetCurrency) {
-        this.targetCurrency = targetCurrency;
+        this.IND = targetCurrency;
     }
 
-    public BigDecimal getRate() {
-        return rate;
-    }
+//    public BigDecimal getRate() {
+//        return rate;
+//    }
 
-    public void setRate(BigDecimal rate) {
-        this.rate = rate;
-    }
+//    public void setRate(BigDecimal rate) {
+//        this.rate = rate;
+//    }
 
     public LocalDate getDate() {
         return date;
@@ -68,9 +67,9 @@ public class ExchangeRate {
     public String toString() {
         return "ExchangeRate{" +
                 "id=" + id +
-                ", sourceCurrency='" + sourceCurrency + '\'' +
-                ", targetCurrency='" + targetCurrency + '\'' +
-                ", rate=" + rate +
+                ", sourceCurrency='" + USD + '\'' +
+                ", targetCurrency='" + IND + '\'' +
+//                ", rate=" + rate +
                 ", date=" + date +
                 '}';
     }
