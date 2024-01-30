@@ -6,8 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import org.json.*;
@@ -18,10 +18,10 @@ import java.io.InputStreamReader;
 
 @Service
 public class CurrencyFetchService {
+    @Autowired
     CurrencyExchangeRepository currencyExchangeRepository;
 
-    public CurrencyFetchService(CurrencyExchangeRepository currencyExchangeRepository){
-        this.currencyExchangeRepository = currencyExchangeRepository;
+    public CurrencyFetchService(){
     }
 
     public String FetchExchange(LocalDate toDate, LocalDate fromDate){
@@ -30,6 +30,11 @@ public class CurrencyFetchService {
             CurrentDate = CurrentDate.plusDays(1);
             FetchExchangeByDateFromAPI(CurrentDate);
         }
+        return "Success";
+    }
+
+    public String FetchExchange(LocalDate date){
+        FetchExchangeByDateFromAPI(date);
         return "Success";
     }
 
@@ -74,6 +79,6 @@ public class CurrencyFetchService {
                 obj.getJSONObject("eur").getDouble("aud"), obj.getJSONObject("eur").getDouble("sgd"),obj.getJSONObject("eur").getDouble("cad"),
                 obj.getJSONObject("eur").getDouble("kyd"), obj.getJSONObject("eur").getDouble("cny"),obj.getJSONObject("eur").getDouble("jpy"),
                 obj.getJSONObject("eur").getDouble("mxn"));
-        this.currencyExchangeRepository.save(currencyObj);
+        currencyExchangeRepository.save(currencyObj);
     }
 }

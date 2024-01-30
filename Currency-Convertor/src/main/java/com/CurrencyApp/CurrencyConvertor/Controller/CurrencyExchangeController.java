@@ -1,6 +1,7 @@
 package com.CurrencyApp.CurrencyConvertor.Controller;
 
 import com.CurrencyApp.CurrencyConvertor.CurrencyConvertorApplication;
+import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Response.ResponseHandler;
 import com.CurrencyApp.CurrencyConvertor.Service.CurrencyExchangeService;
@@ -41,5 +42,10 @@ public class CurrencyExchangeController
             LocalDate StartDate = LocalDate.parse(toDate);
             LocalDate EndDate = LocalDate.parse(fromDate);
             return currencyExchangeService.FetchExchange(StartDate, EndDate);
+    }
+
+    @GetMapping("/Conversion")
+    public String convertCurrency(@RequestBody Currency currency){
+        return currencyExchangeService.ConversionRate(currency);
     }
 }

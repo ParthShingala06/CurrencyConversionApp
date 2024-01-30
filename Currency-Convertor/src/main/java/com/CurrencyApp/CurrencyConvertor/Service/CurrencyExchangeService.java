@@ -1,24 +1,30 @@
 package com.CurrencyApp.CurrencyConvertor.Service;
 
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
+import com.CurrencyApp.CurrencyConvertor.Model.Currency;
+
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 
 @Service
-public class CurrencyExchangeService {
+public class CurrencyExchangeService{
       @Autowired
-    CurrencyFetchService currencyFetchService;
-    CurrencyExchangeRepository currencyExchangeRepository;
+      CurrencyFetchService currencyFetchService;
+      @Autowired
+      CurrencyConversionService currencyConversionService;
+      CurrencyExchangeRepository currencyExchangeRepository;
 
-    public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService){
+    public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService){
+        super();
         this.currencyExchangeRepository = currencyExchangeRepository;
         this.currencyFetchService = currencyFetchService;
+        this.currencyConversionService = currencyConversionService;
     }
 
     public String dumpExchange(CurrencyExchange currencyExchange){
@@ -31,13 +37,13 @@ public class CurrencyExchangeService {
         return "Success";
     }
 
+    public String ConversionRate(Currency currency){
+        return this.currencyConversionService.Conversion(getCurrencyExchange(currency.getDate()), currency);
+    }
+
     public CurrencyExchange getCurrencyExchange(LocalDate date){
         if(currencyExchangeRepository.findByDate(date) == null) {
-            try {
-                throw new Exception("Not Found");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            currencyFetchService.FetchExchange(date);
         }
         return currencyExchangeRepository.findByDate(date);
     }
