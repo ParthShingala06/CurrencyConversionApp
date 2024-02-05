@@ -51,6 +51,15 @@ public class CurrencyConversionService {
             currencyWebGraph.add(new Node(currencyName,"EUR",1/currencyExchange.getCurrencyRatio(currencyName)));
         }
 
+        for(String toCurrencyName : currencyExchange.getCurrenciesList()){
+            for(String fromCurrencyName : currencyExchange.getCurrenciesList()){
+                if(!toCurrencyName.equals(fromCurrencyName)){
+                    currencyWebGraph.add(new Node(fromCurrencyName,toCurrencyName,currencyExchange.getCurrencyRatio(toCurrencyName)/currencyExchange.getCurrencyRatio(fromCurrencyName)));
+                    currencyWebGraph.add(new Node(toCurrencyName,fromCurrencyName,currencyExchange.getCurrencyRatio(fromCurrencyName)/currencyExchange.getCurrencyRatio(toCurrencyName)));
+                }
+            }
+        }
+
 
         traverseGraph(currencyWebGraph);
         ConversionResult conversion = getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyWebGraph);
