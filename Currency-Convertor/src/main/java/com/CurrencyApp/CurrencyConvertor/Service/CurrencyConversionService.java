@@ -25,18 +25,40 @@ public class CurrencyConversionService {
         }
     }
 
+    public static class ConversionResult {
+        List<String> path;
+        Double ratio;
+
+        public ConversionResult(List<String> path, double ratio) {
+            this.path = path;
+            this.ratio = ratio;
+        }
+    }
+
+    private void traverseGraph(List<Node> graph) {
+        System.out.println("Traversing the currency graph:");
+        for (Node node : graph) {
+            System.out.println("From: " + node.fromCurrency + ", To: " + node.toCurrency + ", Ratio: " + node.ratio);
+        }
+    }
+
     public String Conversion( CurrencyExchange currencyExchange, Currency currency){
         List<Node> currencyWebGraph = new ArrayList<Node>();
         ArrayList<String> addedCurrencies = new ArrayList<String>();
 
         for(String currencyName : currencyExchange.getCurrenciesList()){
             currencyWebGraph.add(new Node("EUR",currencyName,currencyExchange.getCurrencyRatio(currencyName)));
+            currencyWebGraph.add(new Node(currencyName,"EUR",1/currencyExchange.getCurrencyRatio(currencyName)));
         }
-        Double conversionRate = getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyWebGraph);
-        return "Converted"+conversionRate+"Existing"+currencyExchange.getCurrencyRatio("USD");
+
+
+        traverseGraph(currencyWebGraph);
+        ConversionResult conversion = getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyWebGraph);
+        System.out.println(conversion.path);
+        return "Converted"+conversion.ratio+"Existing"+currencyExchange.getCurrencyRatio("USD");
     }
 
-    public Double getRatio(String start, String end, List<Node> data) {
+    public ConversionResult getRatio(String start, String end, List<Node> data) {
         Map<String, Map<String, Double>> map = new HashMap<>();
         for (Node node: data) {
             if (!map.containsKey(node.fromCurrency)) map.put(node.fromCurrency, new HashMap<>());
@@ -46,12 +68,16 @@ public class CurrencyConversionService {
         }
         Queue<String> q = new LinkedList<>();
         Queue<Double> val = new LinkedList<>();
+        Queue<List<String>> pathQueue = new LinkedList<>();
         q.offer(start);
         val.offer(1.0);
+        pathQueue.offer(new ArrayList<>(Collections.singletonList(start)));
         Set<String> visited = new HashSet<>();
         while(!q.isEmpty()) {
             String cur = q.poll();
             double num = val.poll();
+            List<String> path = pathQueue.poll();
+
             if (visited.contains(cur)) continue;
             visited.add(cur);
             if (map.containsKey(cur)) {
@@ -59,13 +85,17 @@ public class CurrencyConversionService {
                 for (String key: next.keySet()) {
                     if (!visited.contains(key)) {
                         q.offer(key);
-                        if (key.equals(end)) return num*next.get(key);
+                        if (key.equals(end)) return new ConversionResult(path, num);
                         val.offer(num*next.get(key));
+                        List<String> newPath = new ArrayList<>(path);
+                        newPath.add(key);
+
+                        pathQueue.offer(newPath);
                     }
                 }
             }
         }
-        return -1.0;
+        return new ConversionResult(Collections.emptyList(), -1.0);
     }
 
 
