@@ -5,6 +5,7 @@ import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Response.ResponseHandler;
 import com.CurrencyApp.CurrencyConvertor.Service.CurrencyExchangeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/Exchange")
 public class CurrencyExchangeController
 {
+    @Autowired
     CurrencyExchangeService currencyExchangeService;
 
     public CurrencyExchangeController(CurrencyExchangeService currencyExchangeService){

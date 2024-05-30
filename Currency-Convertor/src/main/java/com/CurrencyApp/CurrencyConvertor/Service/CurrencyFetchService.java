@@ -41,11 +41,11 @@ public class CurrencyFetchService {
     public void FetchExchangeByDateFromAPI(LocalDate CurrentDate){
         String data = "";
         try {
-            String baseUrl = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/";
-            String apiUrl = "currencies/eur.json";
+            String baseUrl = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@";
+            String apiUrl = "/v1/currencies/eur.json";
             String formattedDate = CurrentDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            URL url = new URL(baseUrl+"/"+formattedDate+"/"+apiUrl);
-
+            URL url = new URL(baseUrl+formattedDate+apiUrl);
+            System.out.println(url);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
