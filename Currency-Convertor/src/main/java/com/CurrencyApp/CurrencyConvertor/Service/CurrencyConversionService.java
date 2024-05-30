@@ -1,3 +1,10 @@
+////Scenario
+//    Example:
+//            USD - > INR - > EUR - > CAD     and      USD - > CAD 
+//               83.0    0.011    1.48                     1.34
+//            
+//                    = 1.35
+
 package com.CurrencyApp.CurrencyConvertor.Service;
 
 import com.CurrencyApp.CurrencyConvertor.Model.Currency;
@@ -26,12 +33,45 @@ public class CurrencyConversionService {
     }
 
     public static class ConversionResult {
-        List<String> path;
+//        String currency;
+        String Existingpath;
+        Double ExistingRate;
+        String Prposedpath;
+        Double ProposedRate;
+
+
+        public ConversionResult(String existingpath, Double existingRate, String prposedpath, Double proposedRate) {
+            Existingpath = existingpath;
+            ExistingRate = existingRate;
+            Prposedpath = prposedpath;
+            ProposedRate = proposedRate;
+        }
+    }
+
+    public static class CurrencyRatio implements Comparable<CurrencyRatio>{
+        String currency;
         Double ratio;
 
-        public ConversionResult(List<String> path, double ratio) {
-            this.path = path;
+        public CurrencyRatio(String currency, Double ratio) {
+            this.currency = currency;
             this.ratio = ratio;
+        }
+
+        public String getCurrency() {
+            return currency;
+        }
+
+        public Double getRatio() {
+            return ratio;
+        }
+
+        @Override
+        public int compareTo(CurrencyRatio o) {
+            if (this.ratio == o.ratio) {
+                return 1;
+            } else {
+                return Double.compare(this.ratio, o.ratio);
+            }
         }
     }
 
@@ -42,70 +82,93 @@ public class CurrencyConversionService {
         }
     }
 
+    public void printGraph(Map<String, Map<String, Double>> map) {
+        for (String fromCurrency : map.keySet()) {
+            System.out.println(fromCurrency + ":");
+            Map<String, Double> edges = map.get(fromCurrency);
+            for (String toCurrency : edges.keySet()) {
+                System.out.println("  -> " + toCurrency + " (" + edges.get(toCurrency) + ")");
+            }
+        }
+    }
+
     public String Conversion( CurrencyExchange currencyExchange, Currency currency){
-        List<Node> currencyWebGraph = new ArrayList<Node>();
+        List<Node> currencyRatioList = new ArrayList<Node>();
         ArrayList<String> addedCurrencies = new ArrayList<String>();
 
+        // Nodes Creation for each Currency with It's Value with respect to EUR
         for(String currencyName : currencyExchange.getCurrenciesList()){
-            currencyWebGraph.add(new Node("EUR",currencyName,currencyExchange.getCurrencyRatio(currencyName)));
-            currencyWebGraph.add(new Node(currencyName,"EUR",1/currencyExchange.getCurrencyRatio(currencyName)));
+            if(currencyName.equals("EUR")) continue;
+            currencyRatioList.add(new Node("EUR",currencyName,currencyExchange.getCurrencyRatio(currencyName)));
+            currencyRatioList.add(new Node(currencyName,"EUR",1/currencyExchange.getCurrencyRatio(currencyName)));
         }
-
+        // Nodes Creation for each Currency with It's Value 
         for(String toCurrencyName : currencyExchange.getCurrenciesList()){
             for(String fromCurrencyName : currencyExchange.getCurrenciesList()){
-                if(!toCurrencyName.equals(fromCurrencyName)){
-                    currencyWebGraph.add(new Node(fromCurrencyName,toCurrencyName,currencyExchange.getCurrencyRatio(toCurrencyName)/currencyExchange.getCurrencyRatio(fromCurrencyName)));
-                    currencyWebGraph.add(new Node(toCurrencyName,fromCurrencyName,currencyExchange.getCurrencyRatio(fromCurrencyName)/currencyExchange.getCurrencyRatio(toCurrencyName)));
+                if(!toCurrencyName.equals(fromCurrencyName) && !toCurrencyName.equals("EUR") && !fromCurrencyName.equals("EUR") ){
+                    currencyRatioList.add(new Node(fromCurrencyName,toCurrencyName,currencyExchange.getCurrencyRatio(toCurrencyName)/currencyExchange.getCurrencyRatio(fromCurrencyName)));
+                    currencyRatioList.add(new Node(toCurrencyName,fromCurrencyName,currencyExchange.getCurrencyRatio(fromCurrencyName)/currencyExchange.getCurrencyRatio(toCurrencyName)));
                 }
             }
         }
 
+//        Graph Creation
+        Map<String, Map<String, Double>> currencyGraph = new HashMap<>();
+        for (Node node: currencyRatioList) {
+            if (!currencyGraph.containsKey(node.fromCurrency)) currencyGraph.put(node.fromCurrency, new HashMap<>());
+            currencyGraph.get(node.fromCurrency).put(node.toCurrency, node.ratio);
+            if (!currencyGraph.containsKey(node.toCurrency)) currencyGraph.put(node.toCurrency, new HashMap<>());
+            currencyGraph.get(node.toCurrency).put(node.fromCurrency, 1.0/node.ratio);
+        }
 
-        traverseGraph(currencyWebGraph);
-        ConversionResult conversion = getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyWebGraph);
-        System.out.println(conversion.path);
-        return "Converted"+conversion.ratio+"Existing"+currencyExchange.getCurrencyRatio("USD");
+        printGraph(currencyGraph);
+        return getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyGraph);
     }
 
-    public ConversionResult getRatio(String start, String end, List<Node> data) {
-        Map<String, Map<String, Double>> map = new HashMap<>();
-        for (Node node: data) {
-            if (!map.containsKey(node.fromCurrency)) map.put(node.fromCurrency, new HashMap<>());
-            map.get(node.fromCurrency).put(node.toCurrency, node.ratio);
-            if (!map.containsKey(node.toCurrency)) map.put(node.toCurrency, new HashMap<>());
-            map.get(node.toCurrency).put(node.fromCurrency, 1.0/node.ratio);
+    public String getRatio(String start, String end, Map<String, Map<String, Double>> map) {
+        HashMap<String, Boolean> visited = new HashMap<>();
+        HashMap<String, Double> distance = new HashMap<>();
+        HashMap<String, String> paths = new HashMap<>();
+        for(String cur: CurrencyExchange.getCurrenciesList()){
+            distance.put(cur, Double.MAX_VALUE);
+            visited.put(cur, false);
+            paths.put(cur, "");
         }
-        Queue<String> q = new LinkedList<>();
-        Queue<Double> val = new LinkedList<>();
-        Queue<List<String>> pathQueue = new LinkedList<>();
-        q.offer(start);
-        val.offer(1.0);
-        pathQueue.offer(new ArrayList<>(Collections.singletonList(start)));
-        Set<String> visited = new HashSet<>();
-        while(!q.isEmpty()) {
-            String cur = q.poll();
-            double num = val.poll();
-            List<String> path = pathQueue.poll();
+        distance.put(start, 1.0);
 
-            if (visited.contains(cur)) continue;
-            visited.add(cur);
-            if (map.containsKey(cur)) {
-                Map<String, Double> next = map.get(cur);
-                for (String key: next.keySet()) {
-                    if (!visited.contains(key)) {
-                        q.offer(key);
-                        if (key.equals(end)) return new ConversionResult(path, num);
-                        val.offer(num*next.get(key));
-                        List<String> newPath = new ArrayList<>(path);
-                        newPath.add(key);
-
-                        pathQueue.offer(newPath);
+        Queue<CurrencyRatio> queue = new PriorityQueue<>();
+        queue.add(new CurrencyRatio(start,1.0));
+        while(!queue.isEmpty()){
+            String cur = queue.poll().getCurrency();
+            if (!visited.get(cur)){
+                visited.put(cur,true);
+                for (var dest : map.get(cur).entrySet()){
+                    if(distance.get(dest.getKey()) > distance.get(cur)*dest.getValue()){
+                        distance.put(dest.getKey(), distance.get(cur)*dest.getValue());
+                        paths.put(dest.getKey(), paths.get(dest.getKey())+"->"+cur);
                     }
+                    queue.add(new CurrencyRatio(dest.getKey(),distance.get(dest.getKey())));
                 }
             }
         }
-        return new ConversionResult(Collections.emptyList(), -1.0);
-    }
+        for (var node : paths.entrySet()){
+            System.out.println(node.getKey() + "->" + node.getValue());
+        }
+        System.out.println(distance.get(end));
+//        HashMap<String, Double> DikstrasList = DFS(start, visited, distance, map);
+
+        return "existingPath: "+start+"->"+end+"\nexcistingRatio:"+map.get(start).get(end)+"\n\nproposedPath: "+paths.get(end)+"->"+end+"\nproposedRatio:"+distance.get(end);
+        }
+
+//    public HashMap<String, Double> DFS(String root, HashMap<String, Boolean> visited, HashMap<String, Double> distance, Map<String, Map<String, Double>> map){
+//        if (visited.get(root)){
+//            return distance;
+//        }
+//        visited.put(root, true);
+//        for(Map.Entry<String, Double> entry : map.get(root).entrySet())   {
+//
+//        }
+//    }
 
 
 
