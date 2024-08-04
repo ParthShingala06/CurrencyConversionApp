@@ -23,7 +23,7 @@ public class CurrencyExchangeService{
       CurrencyExchangeRepository currencyExchangeRepository;
 
     public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService){
-        super();
+//        super();
         this.currencyExchangeRepository = currencyExchangeRepository;
         this.currencyFetchService = currencyFetchService;
         this.currencyConversionService = currencyConversionService;

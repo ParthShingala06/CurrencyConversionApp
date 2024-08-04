@@ -41,9 +41,9 @@ public class CurrencyExchangeController
     public String loadCurrencyExchanges(
             @PathVariable("toDate") String toDate,
             @PathVariable("fromDate")String fromDate){
-            LocalDate StartDate = LocalDate.parse(toDate);
-            LocalDate EndDate = LocalDate.parse(fromDate);
-            return currencyExchangeService.FetchExchange(StartDate, EndDate);
+                LocalDate StartDate = LocalDate.parse(toDate);
+                LocalDate EndDate = LocalDate.parse(fromDate);
+                return currencyExchangeService.FetchExchange(StartDate, EndDate);
     }
 
     @GetMapping("/Conversion")

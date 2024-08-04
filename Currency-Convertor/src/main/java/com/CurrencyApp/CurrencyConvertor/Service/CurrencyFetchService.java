@@ -27,8 +27,8 @@ public class CurrencyFetchService {
     public String FetchExchange(LocalDate toDate, LocalDate fromDate){
         LocalDate CurrentDate = toDate;
         while(!CurrentDate.equals(fromDate)){
-            CurrentDate = CurrentDate.plusDays(1);
             FetchExchangeByDateFromAPI(CurrentDate);
+            CurrentDate = CurrentDate.plusDays(1);
         }
         return "Success";
     }
