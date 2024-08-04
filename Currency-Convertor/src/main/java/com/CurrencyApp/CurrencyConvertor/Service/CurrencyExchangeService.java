@@ -6,6 +6,7 @@ import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,10 +19,11 @@ public class CurrencyExchangeService{
       CurrencyFetchService currencyFetchService;
       @Autowired
       CurrencyConversionService currencyConversionService;
+      @Autowired
       CurrencyExchangeRepository currencyExchangeRepository;
 
     public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService){
-        super();
+//        super();
         this.currencyExchangeRepository = currencyExchangeRepository;
         this.currencyFetchService = currencyFetchService;
         this.currencyConversionService = currencyConversionService;

@@ -32,7 +32,7 @@ public class CurrencyExchange {
     private Double JPY;
     private Double MXN;
     private Integer TotalCurrencies = 15;
-    private String[] CurrenciesList =  {"USD","INR","RUB","BHD","OMR","GBD","CHF","NZD","AUD","SGD","CAD","KYD","CNY","JPY","MXN"};
+    private static String[] CurrenciesList =  {"USD","INR","RUB","BHD","OMR","GBD","CHF","NZD","AUD","SGD","CAD","KYD","CNY","JPY","MXN","EUR"};
 
 
 
@@ -95,7 +95,7 @@ public class CurrencyExchange {
     public Double getJPY() { return JPY;}
     public Double getMXN() { return MXN;}
     public Integer getTotalCurrencies() { return TotalCurrencies; }
-    public String[] getCurrenciesList() { return CurrenciesList; }
+    public static String[] getCurrenciesList() { return CurrenciesList; }
 
 
 
