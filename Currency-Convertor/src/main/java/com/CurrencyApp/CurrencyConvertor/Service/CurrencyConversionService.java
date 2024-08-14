@@ -7,10 +7,10 @@
 
 package com.CurrencyApp.CurrencyConvertor.Service;
 
-import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
+import com.CurrencyApp.CurrencyConvertor.Model.Currency;
+
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,22 +29,6 @@ public class CurrencyConversionService {
             this.fromCurrency = fromCurrency;
             this.toCurrency = toCurrency;
             this.ratio = ratio;
-        }
-    }
-
-    public static class ConversionResult {
-//        String currency;
-        String Existingpath;
-        Double ExistingRate;
-        String Prposedpath;
-        Double ProposedRate;
-
-
-        public ConversionResult(String existingpath, Double existingRate, String prposedpath, Double proposedRate) {
-            Existingpath = existingpath;
-            ExistingRate = existingRate;
-            Prposedpath = prposedpath;
-            ProposedRate = proposedRate;
         }
     }
 
@@ -121,7 +105,6 @@ public class CurrencyConversionService {
             currencyGraph.get(node.toCurrency).put(node.fromCurrency, 1.0/node.ratio);
         }
 
-        printGraph(currencyGraph);
         return getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyGraph);
     }
 
@@ -151,10 +134,7 @@ public class CurrencyConversionService {
                 }
             }
         }
-        for (var node : paths.entrySet()){
-            System.out.println(node.getKey() + "->" + node.getValue());
-        }
-        System.out.println(distance.get(end));
+
 //        HashMap<String, Double> DikstrasList = DFS(start, visited, distance, map);
 
         return "existingPath: "+start+"->"+end+"\nexcistingRatio:"+map.get(start).get(end)+"\n\nproposedPath: "+paths.get(end)+"->"+end+"\nproposedRatio:"+distance.get(end);

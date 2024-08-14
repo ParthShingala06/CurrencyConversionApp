@@ -4,7 +4,6 @@ import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
