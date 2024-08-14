@@ -134,7 +134,7 @@ public class CurrencyConversionService {
                 }
             }
         }
-//        System.out.println(distance.get(end));
+
 //        HashMap<String, Double> DikstrasList = DFS(start, visited, distance, map);
 
         return "existingPath: "+start+"->"+end+"\nexcistingRatio:"+map.get(start).get(end)+"\n\nproposedPath: "+paths.get(end)+"->"+end+"\nproposedRatio:"+distance.get(end);
