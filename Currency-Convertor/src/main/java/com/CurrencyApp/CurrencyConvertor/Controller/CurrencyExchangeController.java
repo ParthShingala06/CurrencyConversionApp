@@ -2,6 +2,7 @@ package com.CurrencyApp.CurrencyConvertor.Controller;
 
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Model.Currency;
+import com.CurrencyApp.CurrencyConvertor.Model.Response;
 import com.CurrencyApp.CurrencyConvertor.Response.ResponseHandler;
 import com.CurrencyApp.CurrencyConvertor.Service.CurrencyExchangeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,8 @@ public class CurrencyExchangeController
                 return currencyExchangeService.FetchExchange(StartDate, EndDate);
     }
 
-    @PostMapping("/Conversion")
+    @PostMapping(value="/Conversion", produces = "application/json")
     public String convertCurrency(@RequestBody Currency currency){
-        return currencyExchangeService.ConversionRate(currency);
+        return currencyExchangeService.ConversionRate(currency).toJson();
     }
 }
