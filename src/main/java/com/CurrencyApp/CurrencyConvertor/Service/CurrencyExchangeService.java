@@ -3,6 +3,7 @@ package com.CurrencyApp.CurrencyConvertor.Service;
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 
+import com.CurrencyApp.CurrencyConvertor.Model.Response;
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -38,7 +39,7 @@ public class CurrencyExchangeService{
         return "Success";
     }
 
-    public String ConversionRate(Currency currency){
+    public Response ConversionRate(Currency currency){
         return this.currencyConversionService.Conversion(getCurrencyExchange(currency.getDate()), currency);
     }
 

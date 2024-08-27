@@ -10,9 +10,9 @@
 	</parent>
 
 	<groupId>com.CurrencyApp</groupId>
-	<artifactId>Currency-Convertor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Currency-Convertor</name>
+	<artifactId>Rate-Edge</artifactId>
+	<version>0.0.1</version>
+	<name>RateEdge</name>
 	<description>RateEdge - Optimized Forex Conversion Tool</description>
 
 	<properties>

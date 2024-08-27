@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    image: mysql:8.0.33
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=Qwerty12345
+      - MYSQL_DATABASE=Curr_Conv_DB
+    ports:
+      - 3307:3306
+    volumes:
+      - db:/var/lib/mysql
+  app:
+    depends_on:
+      - mysqldb
+    build:
+        dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - 8090:8080
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://mysqldb:3306/Curr_Conv_DB?useSSL=false&allowPublicKeyRetrieval=true",
+        "spring.datasource.username" : "root",
+        "spring.datasource.password" : "Qwerty12345",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQL8Dialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
