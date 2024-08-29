@@ -12,6 +12,8 @@ import com.CurrencyApp.CurrencyConvertor.Model.Currency;
 import com.CurrencyApp.CurrencyConvertor.Model.Response;
 
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,6 +21,9 @@ import java.util.*;
 @Service
 public class CurrencyConversionService {
     CurrencyExchangeRepository currencyExchangeRepository;
+
+    private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
+
     static class Node{
         String fromCurrency;
         String toCurrency;
@@ -76,88 +81,113 @@ public class CurrencyConversionService {
         HashMap<String, Boolean> visited = new HashMap<>();
         HashMap<String, Double> distance = new HashMap<>();
         HashMap<String, String> paths = new HashMap<>();
-        // Creating Empty Entities
-        for(String cur: CurrencyExchange.getCurrenciesList()){
+
+        // Initialize entities
+        for (String cur : CurrencyExchange.getCurrenciesList()) {
             distance.put(cur, Double.MAX_VALUE);
             visited.put(cur, false);
             paths.put(cur, "");
         }
-        // Making FromCurrencyRatio as 1
+
+        // Set the starting currency ratio as 1
         distance.put(start, 1.0);
 
         Queue<CurrencyRatio> queue = new PriorityQueue<>();
-        // 1st Element in Queue
-        queue.add(new CurrencyRatio(start,1.0));
-        while(!queue.isEmpty()){
+        queue.add(new CurrencyRatio(start, 1.0));
+
+        while (!queue.isEmpty()) {
             String cur = queue.poll().getCurrency();
-            if (!visited.get(cur)){
-                visited.put(cur,true);
-                // Checking all the Neighbours
-                for (var dest : map.get(cur).entrySet()){
-                    // If existing is greater than the new path
-                    if(distance.get(dest.getKey()) > distance.get(cur)*dest.getValue()){
-                        distance.put(dest.getKey(), distance.get(cur)*dest.getValue());
-                        paths.put(dest.getKey(), paths.get(dest.getKey())+"->"+cur);
+
+            if (!visited.get(cur)) {
+                visited.put(cur, true);
+
+                // Process neighbors
+                for (var dest : map.getOrDefault(cur, Collections.emptyMap()).entrySet()) {
+                    Double newDistance = distance.get(cur) * dest.getValue();
+
+                    if (distance.get(dest.getKey()) > newDistance) {
+                        distance.put(dest.getKey(), newDistance);
+                        paths.put(dest.getKey(), paths.get(cur) + "->" + cur);
                     }
-                    queue.add(new CurrencyRatio(dest.getKey(),distance.get(dest.getKey())));
+
+                    queue.add(new CurrencyRatio(dest.getKey(), distance.get(dest.getKey())));
                 }
             }
         }
 
-//        HashMap<String, Double> DikstrasList = DFS(start, visited, distance, map);
+        // Handle cases where the path or distance may not be available
+        String existingPath = paths.getOrDefault(end, "Path not found");
+        Double existingRate = map.getOrDefault(start, Collections.emptyMap()).getOrDefault(end, null);
+        String proposedPath = paths.getOrDefault(end, "Path not found") + "->" + end;
+        Double proposedRate = distance.getOrDefault(end, null);
 
+        if (existingRate == null) {
+            logger.warn("No exchange rate found from {} to {}", start, end);
+        }
 
-           return new Response(
-                    start+"->"+end,
-                    map.get(start).get(end),
-                    paths.get(end)+"->"+end,
-                    distance.get(end)
-            );
+        logger.info("Successfully completed the request. Start: {}, End: {}", start, end);
+        logger.debug("Existing Path: {}, Existing Rate: {}", existingPath, existingRate);
+        logger.debug("Proposed Path: {}, Proposed Rate: {}", proposedPath, proposedRate);
 
-//        return "existingPath: "+start+"->"+end+"\nexcistingRatio:"+map.get(start).get(end)+"\n\nproposedPath: "+paths.get(end)+"->"+end+"\nproposedRatio:"+distance.get(end);
+        return new Response(
+                start + "->" + end,
+                existingRate,
+                proposedPath,
+                proposedRate
+        );
     }
 
-    public Response Conversion( CurrencyExchange currencyExchange, Currency currency){
-        List<Node> currencyRatioList = new ArrayList<Node>();
+    public Response Conversion(CurrencyExchange currencyExchange, Currency currency) {
+        List<Node> currencyRatioList = new ArrayList<>();
 
-        // Nodes Creation for each Currency with It's Value with respect to EUR
-        for(String currencyName : CurrencyExchange.getCurrenciesList()){
-            if(currencyName.equals("EUR")) continue;
-            currencyRatioList.add(new Node("EUR",currencyName,currencyExchange.getCurrencyRatio(currencyName)));
-            currencyRatioList.add(new Node(currencyName,"EUR",1/currencyExchange.getCurrencyRatio(currencyName)));
-        }
-        // Nodes Creation for each Currency with It's Value 
-        for(String toCurrencyName : CurrencyExchange.getCurrenciesList()){
-            for(String fromCurrencyName : CurrencyExchange.getCurrenciesList()){
-                if(!toCurrencyName.equals(fromCurrencyName) && !toCurrencyName.equals("EUR") && !fromCurrencyName.equals("EUR") ){
-                    currencyRatioList.add(new Node(fromCurrencyName,toCurrencyName,currencyExchange.getCurrencyRatio(toCurrencyName)/currencyExchange.getCurrencyRatio(fromCurrencyName)));
-                    currencyRatioList.add(new Node(toCurrencyName,fromCurrencyName,currencyExchange.getCurrencyRatio(fromCurrencyName)/currencyExchange.getCurrencyRatio(toCurrencyName)));
+        try {
+            // Nodes Creation for each Currency with Its Value with respect to EUR
+            for (String currencyName : CurrencyExchange.getCurrenciesList()) {
+                if (currencyName.equals("EUR")) continue;
+
+                double ratioToEUR = currencyExchange.getCurrencyRatio(currencyName);
+                double ratioFromEUR = 1 / ratioToEUR;
+
+                currencyRatioList.add(new Node("EUR", currencyName, ratioToEUR));
+                currencyRatioList.add(new Node(currencyName, "EUR", ratioFromEUR));
+            }
+
+            // Nodes Creation for each Currency with Its Value
+            for (String toCurrencyName : CurrencyExchange.getCurrenciesList()) {
+                for (String fromCurrencyName : CurrencyExchange.getCurrenciesList()) {
+                    if (!toCurrencyName.equals(fromCurrencyName) && !toCurrencyName.equals("EUR") && !fromCurrencyName.equals("EUR")) {
+                        double ratioTo = currencyExchange.getCurrencyRatio(toCurrencyName) / currencyExchange.getCurrencyRatio(fromCurrencyName);
+                        double ratioFrom = currencyExchange.getCurrencyRatio(fromCurrencyName) / currencyExchange.getCurrencyRatio(toCurrencyName);
+
+                        currencyRatioList.add(new Node(fromCurrencyName, toCurrencyName, ratioTo));
+                        currencyRatioList.add(new Node(toCurrencyName, fromCurrencyName, ratioFrom));
+                    }
                 }
             }
-        }
 
-        //   Graph Creation
-        Map<String, Map<String, Double>> currencyGraph = new HashMap<>();
-        for (Node node: currencyRatioList) {
-            if (!currencyGraph.containsKey(node.fromCurrency)) currencyGraph.put(node.fromCurrency, new HashMap<>());
-            currencyGraph.get(node.fromCurrency).put(node.toCurrency, node.ratio);
-            if (!currencyGraph.containsKey(node.toCurrency)) currencyGraph.put(node.toCurrency, new HashMap<>());
-            currencyGraph.get(node.toCurrency).put(node.fromCurrency, 1.0/node.ratio);
+            // Graph Creation
+            Map<String, Map<String, Double>> currencyGraph = new HashMap<>();
+            for (Node node : currencyRatioList) {
+                currencyGraph.computeIfAbsent(node.fromCurrency, k -> new HashMap<>())
+                        .put(node.toCurrency, node.ratio);
+
+                currencyGraph.computeIfAbsent(node.toCurrency, k -> new HashMap<>())
+                        .put(node.fromCurrency, 1.0 / node.ratio);
+            }
+
+            // Conversion Call
+            Response response = getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyGraph);
+
+            logger.info("Conversion request completed from {} to {}", currency.getFromCurrency(), currency.getToCurrency());
+            return response;
+        } catch (Exception e) {
+            logger.error("Error during currency conversion from {} to {}: {}",
+                    currency.getFromCurrency(), currency.getToCurrency(), e.getMessage(), e);
+            throw e;
         }
-        // Conversion Call
-        return getRatio(currency.getFromCurrency(), currency.getToCurrency(), currencyGraph);
     }
 
 
-//    public HashMap<String, Double> DFS(String root, HashMap<String, Boolean> visited, HashMap<String, Double> distance, Map<String, Map<String, Double>> map){
-//        if (visited.get(root)){
-//            return distance;
-//        }
-//        visited.put(root, true);
-//        for(Map.Entry<String, Double> entry : map.get(root).entrySet())   {
-//
-//        }
-//    }
 
 
 

@@ -97,6 +97,8 @@ public class CurrencyExchange {
     public Integer getTotalCurrencies() { return TotalCurrencies; }
     public static String[] getCurrenciesList() { return CurrenciesList; }
 
+    public static String getCurrenciesListString() { return String.join(", ", CurrenciesList); }
+
 
 
     public void setDate(LocalDate date) {
