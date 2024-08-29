@@ -11,7 +11,7 @@
 
 	<groupId>com.CurrencyApp</groupId>
 	<artifactId>Rate-Edge</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<name>RateEdge</name>
 	<description>RateEdge - Optimized Forex Conversion Tool</description>
 

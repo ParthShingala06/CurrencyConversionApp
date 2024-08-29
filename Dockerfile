@@ -7,7 +7,7 @@ MAINTAINER https://parthshingala06.github.io/
 WORKDIR /app
 
 # Copy the application's JAR file to the container
-COPY target/Rate-Edge-0.0.1.jar app.jar
+COPY target/Rate-Edge-0.0.2.jar app.jar
 
 # Expose the port thata the application will run on
 EXPOSE 8080
