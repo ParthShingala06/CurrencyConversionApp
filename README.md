@@ -1,5 +1,11 @@
 # RateEdge
-## Optimized Forex Conversion Tool
+## Optimized Forex Conversion Tool - [Live Demo](http://ec2-18-191-188-215.us-east-2.compute.amazonaws.com:8090/v1/swagger-ui/index.html)
+
+## Description:
+### Maximize Your Returns with Optimized Forex Exchanges.
+The API offers advanced currency conversion capabilities, including the ability to identify and recommend the most profitable path for forex conversions. By analyzing various exchange rates, the API calculates and provides the path that yields the highest gains, ensuring optimal returns on currency exchanges.
+
+
 
 ## Requirements
 For building and running the application you need:
