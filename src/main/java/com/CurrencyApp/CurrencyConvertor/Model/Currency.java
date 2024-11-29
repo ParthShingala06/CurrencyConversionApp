@@ -7,9 +7,6 @@ public class Currency {
     private String toCurrency;
     private String fromCurrency;
 
-    public Currency(){
-    }
-
     public Currency(LocalDate date,String toCurrency, String fromCurrency){
         this.date = date;
         this.toCurrency = toCurrency;

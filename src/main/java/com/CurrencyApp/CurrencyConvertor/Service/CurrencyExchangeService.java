@@ -3,11 +3,9 @@ package com.CurrencyApp.CurrencyConvertor.Service;
 import com.CurrencyApp.CurrencyConvertor.Controller.CurrencyExchangeController;
 import com.CurrencyApp.CurrencyConvertor.Model.CurrencyExchange;
 import com.CurrencyApp.CurrencyConvertor.Model.Currency;
-
 import com.CurrencyApp.CurrencyConvertor.Model.Response;
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,87 +15,115 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Service
-public class CurrencyExchangeService{
-      @Autowired
-      CurrencyFetchService currencyFetchService;
-      @Autowired
-      CurrencyConversionService currencyConversionService;
-      @Autowired
-      CurrencyExchangeRepository currencyExchangeRepository;
+public class CurrencyExchangeService {
 
-        private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
+    @Autowired
+    private CurrencyFetchService currencyFetchService;
 
-    public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService){
-//        super();
+    @Autowired
+    private CurrencyConversionService currencyConversionService;
+
+    @Autowired
+    private CurrencyExchangeRepository currencyExchangeRepository;
+
+    private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
+
+    public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService) {
         this.currencyExchangeRepository = currencyExchangeRepository;
         this.currencyFetchService = currencyFetchService;
         this.currencyConversionService = currencyConversionService;
     }
 
-    public String dumpExchange(CurrencyExchange currencyExchange){
-        this.currencyExchangeRepository.save(currencyExchange);
-        logger.info("Request handled successfully.");
-        return "Request Successful";
-    }
-
-    public List<CurrencyExchange> FetchExchange(LocalDate fromDate, LocalDate toDate) {
+    /**
+     * Fetches currency exchange data between two dates, calls an API for each date in the range, and stores the data.
+     *
+     * @param fromDate The start date of the data fetch
+     * @param toDate The end date of the data fetch
+     * @return A list of CurrencyExchange objects fetched for the given date range
+     */
+    public List<CurrencyExchange> fetchExchange(LocalDate fromDate, LocalDate toDate) {
         List<CurrencyExchange> result = new ArrayList<>();
         LocalDate currentDate = fromDate;
 
-        // Loop through the date range and fetch data for each date
+        // Loop through the date range and fetch data for each day
         while (!currentDate.isAfter(toDate)) {
             try {
-                // Fetch and store exchange data for the current date
                 CurrencyExchange exchangeData = getCurrencyExchange(currentDate);
                 result.add(exchangeData);
-                logger.info("Fetched data for date: {}", currentDate);
+
+                logger.info("Fetched and stored data for date: {}", currentDate);
             } catch (Exception e) {
-                // Log the error and handle it if needed
                 logger.error("Failed to fetch data for date: {}. Error: {}", currentDate, e.getMessage(), e);
             }
-            currentDate = currentDate.plusDays(1); // Move to the next date
+            currentDate = currentDate.plusDays(1); // Move to the next day
         }
 
-        logger.info("Fetched data from public API and dumped into DB for date range: {} to {}", fromDate, toDate);
-        logger.info("Request handled successfully.");
+        logger.info("Fetched and stored data from {} to {}", fromDate, toDate);
         return result;
     }
 
-    public String DumpExchange(LocalDate toDate, LocalDate fromDate){
-        this.currencyFetchService.FetchExchange(toDate, fromDate);
-        logger.info("Fetched data from public API and dumped into DB");
-        logger.info("Request handled successfully.");
+    /**
+     * Triggers the fetch of currency exchange data from a public API for the given date range and stores it in the database.
+     *
+     * @param toDate The end date of the fetch
+     * @param fromDate The start date of the fetch
+     * @return A success message indicating the operation was successful
+     */
+    public String dumpExchange(LocalDate toDate, LocalDate fromDate) {
+        this.currencyFetchService.fetchExchange(toDate, fromDate);
+        logger.info("Fetched data from public API and stored in database.");
         return "Request Successful";
     }
 
-    public Response ConversionRate(Currency currency){
-        return this.currencyConversionService.Conversion(getCurrencyExchange(currency.getDate()), currency);
+    /**
+     * Converts the given currency using the exchange rate of the specified date.
+     *
+     * @param currency The currency object containing conversion details
+     * @return A Response object with the conversion result
+     */
+    public Response conversionRate(Currency currency) {
+        return this.currencyConversionService.conversion(getCurrencyExchange(currency.getDate()), currency);
     }
 
+    /**
+     * Retrieves the currency exchange data for a specific date. If no data is found in the database,
+     * it fetches the data from a public API and saves it.
+     *
+     * @param date The date for which to retrieve the exchange data
+     * @return The CurrencyExchange object for the given date
+     */
     public CurrencyExchange getCurrencyExchange(LocalDate date) {
         try {
+            // Try to fetch the data from the database
             CurrencyExchange exchangeData = currencyExchangeRepository.findByDate(date);
+
+            // If no data is found, fetch from public API
             if (exchangeData == null) {
-                logger.info("Data not found for {}. Fetching from public API and saving to DB.", date);
-                currencyFetchService.FetchExchange(date);
+                logger.info("Data not found for {}. Fetching from public API.", date);
+                currencyFetchService.fetchExchange(date);
                 exchangeData = currencyExchangeRepository.findByDate(date);
             }
-            logger.info("Request for {} handled successfully.", date);
+
+            logger.info("Successfully handled request for {}", date);
             return exchangeData;
         } catch (Exception exception) {
-            logger.error("Exception while finding data for {}: {}", date, exception.toString(), exception);
+            logger.error("Error while retrieving data for {}: {}", date, exception.getMessage(), exception);
             throw exception;
         }
     }
 
-
+    /**
+     * Retrieves all currency exchange data from the database.
+     *
+     * @return A list of all CurrencyExchange records
+     */
     public List<CurrencyExchange> getAllCurrencyExchanges() {
         try {
             List<CurrencyExchange> result = currencyExchangeRepository.findAll();
-            logger.info("Fetched all currency exchange data successfully, total records: {}", result.size());
+            logger.info("Successfully fetched all currency exchange data. Total records: {}", result.size());
             return result;
         } catch (Exception exception) {
-            logger.error("Exception occurred while retrieving all currency exchange data: {}", exception.toString(), exception);
+            logger.error("Error while retrieving all currency exchange data: {}", exception.getMessage(), exception);
             throw exception;
         }
     }

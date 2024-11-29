@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -29,9 +28,6 @@ public class CurrencyExchangeController
     @Autowired
     CurrencyExchangeService currencyExchangeService;
 
-    public CurrencyExchangeController(CurrencyExchangeService currencyExchangeService){
-        this.currencyExchangeService = currencyExchangeService;
-    }
 
     @GetMapping("/get/{Date}")
     @Operation(summary = "Get exchange details for a specific date",
@@ -103,7 +99,7 @@ public class CurrencyExchangeController
         }
         logger.info("Fetching currency exchange data from {} to {}", startDate, endDate);
         return ResponseHandler.responseBuilder("The currency values are with respect to 1 EUR",
-                HttpStatus.OK, currencyExchangeService.FetchExchange(startDate, endDate));
+                HttpStatus.OK, currencyExchangeService.fetchExchange(startDate, endDate));
     }
 
     @GetMapping("/loadCurrencyToDB/{toDate}/{fromDate}")
@@ -134,7 +130,7 @@ public class CurrencyExchangeController
         }
         logger.info("Fetching currency exchange data from {} to {}", startDate, endDate);
         return ResponseHandler.responseBuilder("Request Successfull",
-                HttpStatus.OK, currencyExchangeService.DumpExchange(startDate, endDate));
+                HttpStatus.OK, currencyExchangeService.dumpExchange(startDate, endDate));
     }
 
     @PostMapping(value="/smartConversion", produces = "application/json")
@@ -154,7 +150,7 @@ public class CurrencyExchangeController
 
         try {
             // Perform the currency conversion
-            String conversionResult = currencyExchangeService.ConversionRate(currency).toJson();
+            String conversionResult = currencyExchangeService.conversionRate(currency).toJson();
 
             // Log success and return the result
             logger.info("Currency conversion successful: From {} to {} on {}",
