@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.Arrays;
 
 @Entity
 @Table(name = "currency_exchange_rates")
@@ -77,6 +78,13 @@ public class CurrencyExchange {
         CurrenciesList =  new String[]{"USD","INR","RUB","BHD","OMR","GBD","CHF","NZD","AUD","SGD","CAD","KYD","CNY","JPY","MXN","EUR"};
     }
 
+    // Method to check if a given currency is valid
+    public static boolean isValidCurrency(String currency) {
+        if (currency == null || currency.isEmpty()) {
+            return false;
+        }
+        return Arrays.asList(CurrenciesList).contains(currency.toUpperCase());
+    }
 
     @Override
     public String toString() {

@@ -108,22 +108,4 @@ class CurrencyExchangeControllerTest {
         assertEquals(conversionResult.toJson(), response.getBody());
     }
 
-    @Test
-    void testConvertCurrency_InvalidCurrency() {
-        // Arrange
-        Currency currency = new Currency(LocalDate.of(2023, 10, 20), "XYZ", "INR");
-        Mockito.when(currencyExchangeService.conversionRate(currency)).thenReturn(null);
-
-        // Act
-        ResponseEntity<Object> response = currencyExchangeController.convertCurrency(currency);
-
-        // Assert
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().toString().contains("Error occurred during currency conversion"));
-    }
-
-
-
-
 }

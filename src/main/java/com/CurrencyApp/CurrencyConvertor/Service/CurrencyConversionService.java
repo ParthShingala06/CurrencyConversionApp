@@ -84,6 +84,15 @@ public class CurrencyConversionService {
      * @return A Response object with the conversion path and rate.
      */
     public Response getRatio(String start, String end, Map<String, Map<String, Double>> map) {
+        if (map == null || !map.containsKey(start) || !map.containsKey(end)) {
+            logger.error("The conversion map is null or missing required currencies: {} or {}", start, end);
+            return new Response(
+                    start + "->" + end,
+                    null,
+                    "Path not found",
+                    null
+            );
+        }
         HashMap<String, Boolean> visited = new HashMap<>();
         HashMap<String, Double> distance = new HashMap<>();
         HashMap<String, String> paths = new HashMap<>();
@@ -150,7 +159,11 @@ public class CurrencyConversionService {
      */
     public Response conversion(CurrencyExchange currencyExchange, Currency currency) {
         List<Node> currencyRatioList = new ArrayList<>();
-
+        if (!CurrencyExchange.isValidCurrency(currency.getFromCurrency()) ||
+                !CurrencyExchange.isValidCurrency(currency.getToCurrency())) {
+            throw new IllegalArgumentException("Not a valid Currency: " +
+                    (CurrencyExchange.isValidCurrency(currency.getFromCurrency()) ? currency.getToCurrency() : currency.getFromCurrency()));
+        }
         try {
             // Create nodes for conversion between currencies and EUR as a common base
             for (String currencyName : CurrencyExchange.getCurrenciesList()) {
