@@ -28,11 +28,6 @@ public class CurrencyExchangeService {
 
     private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
 
-    public CurrencyExchangeService(CurrencyExchangeRepository currencyExchangeRepository, CurrencyFetchService currencyFetchService, CurrencyConversionService currencyConversionService) {
-        this.currencyExchangeRepository = currencyExchangeRepository;
-        this.currencyFetchService = currencyFetchService;
-        this.currencyConversionService = currencyConversionService;
-    }
 
     /**
      * Fetches currency exchange data between two dates, calls an API for each date in the range, and stores the data.

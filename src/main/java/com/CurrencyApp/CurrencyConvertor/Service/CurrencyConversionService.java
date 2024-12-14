@@ -6,19 +6,19 @@ import com.CurrencyApp.CurrencyConvertor.Model.Response;
 import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class CurrencyConversionService {
-    private final CurrencyExchangeRepository currencyExchangeRepository;
+    @Autowired
+    private CurrencyExchangeRepository currencyExchangeRepository;
 
     private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
 
-    public CurrencyConversionService(CurrencyExchangeRepository currencyExchangeRepository) {
-        this.currencyExchangeRepository = currencyExchangeRepository;
-    }
+
 
     /**
      * Inner class representing a currency conversion node with source currency, destination currency, and conversion ratio.

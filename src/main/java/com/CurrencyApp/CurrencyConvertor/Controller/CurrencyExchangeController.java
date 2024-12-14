@@ -26,7 +26,7 @@ public class CurrencyExchangeController
     private static final Logger logger = LogManager.getLogger(CurrencyExchangeController.class);
 
     @Autowired
-    CurrencyExchangeService currencyExchangeService;
+    private CurrencyExchangeService currencyExchangeService;
 
 
     @GetMapping("/get/{Date}")
