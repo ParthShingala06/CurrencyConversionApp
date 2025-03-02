@@ -7,9 +7,11 @@ import com.CurrencyApp.CurrencyConvertor.Repository.CurrencyExchangeRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class CurrencyConversionService {
@@ -18,7 +20,17 @@ public class CurrencyConversionService {
 
     private static final Logger logger = LogManager.getLogger(CurrencyExchangeService.class);
 
-
+    /**
+     * Converts currency based on the provided exchange data asynchronously.
+     *
+     * @param currencyExchange The currency exchange data.
+     * @param currency         The currency object containing conversion details.
+     * @return A CompletableFuture wrapping the Response object with the conversion result.
+     */
+    @Async
+    public CompletableFuture<Response> conversionAsync(CurrencyExchange currencyExchange, Currency currency) {
+        return CompletableFuture.supplyAsync(() -> conversion(currencyExchange, currency));
+    }
 
     /**
      * Inner class representing a currency conversion node with source currency, destination currency, and conversion ratio.

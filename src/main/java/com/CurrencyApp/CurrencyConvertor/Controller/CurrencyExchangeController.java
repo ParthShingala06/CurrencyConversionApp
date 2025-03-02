@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/Exchange")
@@ -79,27 +80,34 @@ public class CurrencyExchangeController
                     @ApiResponse(responseCode = "400", description = "Invalid date format"),
                     @ApiResponse(responseCode = "500", description = "Internal server error")
             })
-    public ResponseEntity<Object> getCurrencyExchanges(
+    public CompletableFuture<ResponseEntity<Object>> getCurrencyExchanges(
             @PathVariable("toDate") String toDate,
             @PathVariable("fromDate") String fromDate) {
         // Define the date format expected
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate startDate;
         LocalDate endDate;
-        logger.info("\n========== Request to get currency exchanges for given dates ==========");
+        logger.info("\n========== Request to get currency exchanges for given dates assigned to thread: {} ==========",
+                Thread.currentThread().getName());
         try {
             // Parse the dates using the defined format
             startDate = LocalDate.parse(toDate, formatter);
             endDate = LocalDate.parse(fromDate, formatter);
+
+            return currencyExchangeService.fetchExchangeAsync(startDate, endDate)
+                    .thenApply(data -> ResponseHandler.responseBuilder("The currency values are with respect to 1 EUR",
+                            HttpStatus.OK, data))
+                    .exceptionally(e -> {
+                        logger.error("Error fetching currency exchanges: {}", e.getMessage(), e);
+                        return ResponseHandler.responseBuilder("Error fetching currency exchanges",
+                                HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+                    });
         } catch (DateTimeParseException e) {
-            // Log and handle invalid date format
             logger.error("Date parsing error: {}", e.getMessage(), e);
-            return ResponseHandler.responseBuilder("Invalid date format. Please use dd-MM-yyyy.",
-                    HttpStatus.BAD_REQUEST, e.getMessage());
+            return CompletableFuture.completedFuture(
+                    ResponseHandler.responseBuilder("Invalid date format. Please use dd-MM-yyyy.",
+                            HttpStatus.BAD_REQUEST, e.getMessage()));
         }
-        logger.info("Fetching currency exchange data from {} to {}", startDate, endDate);
-        return ResponseHandler.responseBuilder("The currency values are with respect to 1 EUR",
-                HttpStatus.OK, currencyExchangeService.fetchExchange(startDate, endDate));
     }
 
     @GetMapping("/loadCurrencyToDB/{toDate}/{fromDate}")
@@ -117,7 +125,8 @@ public class CurrencyExchangeController
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate startDate;
         LocalDate endDate;
-        logger.info("\n========== Request to load currency exchanges for given dates ==========");
+        logger.info("\n========== Request to load currency exchanges assigned to thread: {} ==========",
+                Thread.currentThread().getName());
         try {
             // Parse the dates using the defined format
             startDate = LocalDate.parse(toDate, formatter);
